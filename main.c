@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #define MAX_LEN 50
 
@@ -9,7 +10,6 @@ char** read(char* fileName, int* len) {
   fscanf(file, "%d", len);
   char buf[MAX_LEN];
   fgets(buf, MAX_LEN, file);
-  printf("len = %d\n", *len);
   
   char** text = (char**)malloc(sizeof(char*) * *len);
   for (int i = 0; i < *len; i++) {
@@ -25,6 +25,11 @@ char** read(char* fileName, int* len) {
 
   fclose(file);
 
+  // loop through text lines and remove new lines
+  for (int i = 0; i < len[0]; i++) {
+    text[i][strlen(text[i])-1] = '\0';
+  }
+
   return text;
 }
 
@@ -32,10 +37,8 @@ int main () {
   int* spells_len;
   char** spells = read("spells.txt", &spells_len);
 
-  printf("%d\n", spells_len);
-
   for (int i = 0; i < spells_len; i++) {
-    printf("%s\n", spells[i]);
+    printf("%d %s\n", i, spells[i]);
   }
 
   return 0;
