@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAX_LEN 50
+#define MAX_LEN 20
 
 char** read(char* fileName, int* len) {
   FILE *file;
@@ -18,14 +18,14 @@ char** read(char* fileName, int* len) {
 
   int line = 0;
   while ( !feof(file) && !ferror(file) ) { // keep reading until the end of the file
-    if (fgets(text[line], 50, file) != NULL) {
+    if (fgets(text[line], MAX_LEN, file) != NULL) {
       line++;
     }
   }
 
   fclose(file);
 
-  // loop through text lines and remove new lines
+  // loop through text lines and remove linebreaks
   for (int i = 0; i < len[0]; i++) {
     text[i][strlen(text[i])-1] = '\0';
   }
@@ -37,9 +37,31 @@ int main () {
   int* spells_len;
   char** spells = read("spells.txt", &spells_len);
 
-  for (int i = 0; i < spells_len; i++) {
-    printf("%d %s\n", i, spells[i]);
-  }
+  struct player {
+    char * name; // first name
+    char * type; // human or bot
+  }playerOne, playerTwo;
 
+  printf("Player one, enter your name: ");
+  scanf("%s", &playerOne.name);
+  playerOne.type = "human";
+
+  printf("Player two, enter your name: ");
+  scanf("%s", &playerTwo.name);
+  playerTwo.type = "human";
+
+  // display table of spells
+  printf("--------------------\n");
+  printf("|%20s", "|\n");
+  printf("%14s", "SPELLS\n");
+  printf("|%20s", "|\n");
+  printf("--------------------\n");
+  for (int i = 0; i < spells_len; i++) {
+    if (i % 5 == 0 && i != 0) {
+      printf("\n");
+    }
+    printf("%d| %-*s\t", i+1, MAX_LEN+2, spells[i]);
+  }
+  
   return 0;
 }
