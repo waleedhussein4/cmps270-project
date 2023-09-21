@@ -2,17 +2,17 @@
 
 #define MAX_LEN 50
 
-char** read(char* fileName) {
+char** read(char* fileName, int* len) {
   FILE *file;
   file = fopen(fileName, "r");
 
-  int MAX_LINES;
-  fscanf(file, "%d", &MAX_LINES);
+  fscanf(file, "%d", len);
   char buf[MAX_LEN];
   fgets(buf, MAX_LEN, file);
+  printf("len = %d\n", *len);
   
-  char** text = (char**)malloc(sizeof(char*) * MAX_LINES);
-  for (int i = 0; i < MAX_LINES; i++) {
+  char** text = (char**)malloc(sizeof(char*) * *len);
+  for (int i = 0; i < *len; i++) {
     text[i] = (char*)malloc(sizeof(char) * MAX_LEN);
   }
 
@@ -29,9 +29,12 @@ char** read(char* fileName) {
 }
 
 int main () {
-  char** spells = read("spells.txt");
+  int* spells_len;
+  char** spells = read("spells.txt", &spells_len);
 
-  for (int i = 0; i < 78; i++) {
+  printf("%d\n", spells_len);
+
+  for (int i = 0; i < spells_len; i++) {
     printf("%s\n", spells[i]);
   }
 
