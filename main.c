@@ -34,6 +34,20 @@ char** read(char* fileName, int* len) {
   return text;
 }
 
+void displaySpells ( char** spells, int spells_len ) {
+  printf("------------------------\n");
+  printf("|%24s", "|\n");
+  printf("%21s", "AVAILABLE SPELLS\n");
+  printf("|%24s", "|\n");
+  printf("------------------------\n");
+  for (int i = 0; i < spells_len; i++) {
+    if (i % 5 == 0 && i != 0) {
+      printf("\n");
+    }
+    printf("%d| %-*s\t", i+1, MAX_LEN+2, spells[i]);
+  }
+}
+
 int coin () {
   int r = rand() % 2;
   return r;
@@ -58,18 +72,7 @@ int main () {
 
   struct player players[2] = {playerOne, playerTwo};
 
-  // display table of spells
-  printf("--------------------\n");
-  printf("|%20s", "|\n");
-  printf("%14s", "SPELLS\n");
-  printf("|%20s", "|\n");
-  printf("--------------------\n");
-  for (int i = 0; i < spells_len; i++) {
-    if (i % 5 == 0 && i != 0) {
-      printf("\n");
-    }
-    printf("%d| %-*s\t", i+1, MAX_LEN+2, spells[i]);
-  }
+  displaySpells(spells, spells_len);
 
   srand(time(NULL));
   printf("\n\n---------------\n");
