@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <stdbool.h>
 
 #define MAX_LEN 20
 
-char** read(char* fileName, int* len) {
+char** read( char* fileName, int* len ) {
   FILE *file;
   file = fopen(fileName, "r");
 
@@ -18,7 +19,7 @@ char** read(char* fileName, int* len) {
   }
 
   int line = 0;
-  while ( !feof(file) && !ferror(file) ) { // keep reading until the end of the file
+  while ( !feof(file) && !ferror(file) ) { //  keep reading until the end of the file
     if (fgets(text[line], MAX_LEN, file) != NULL) {
       line++;
     }
@@ -26,7 +27,7 @@ char** read(char* fileName, int* len) {
 
   fclose(file);
 
-  // loop through text lines and remove linebreaks
+  //  loop through text lines and remove linebreaks
   for (int i = 0; i < len[0]; i++) {
     text[i][strlen(text[i])-1] = '\0';
   }
@@ -53,13 +54,39 @@ int coin () {
   return r;
 }
 
+bool condition_isInList ( char** spells, int spells_len, char* spell ) {
+  return false;
+}
+
+bool condition_notAlreadyCast ( char** spells, int spells_len, char* spell, char** usedSpells ) {
+  return true;
+}
+
+bool condition_charMatch ( char* spell, char* spell_previous ) {
+  return false;
+}
+
+bool condition_validSpellExists ( char** spells, int spells_len, char* spell_previous ) {
+  return false;
+}
+
+void game ( char** spells, int spells_len, struct player* players, int startingPlayer ) {
+  //  char** usedSpells
+  //  while (true) loop 
+  //  alternate turns, starting with 'startingPlayer'
+  //  check if there exists a valid spell to respond to previous spell. if true, continue, else end game
+  //  input spell
+  //  check conditions 
+  //  if matches conditions, remove it from spells array, otherwise end game
+}
+
 int main () {
   int* spells_len;
   char** spells = read("spells.txt", &spells_len);
 
   struct player {
-    char * name; // first name
-    char * type; // human or bot
+    char * name; //  first name
+    char * type; //  human or bot
   }playerOne, playerTwo;
 
   printf("Player one, enter your name: ");
