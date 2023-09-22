@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #define MAX_LEN 20
 
@@ -33,6 +34,11 @@ char** read(char* fileName, int* len) {
   return text;
 }
 
+int coin () {
+  int r = rand() % 2;
+  return r;
+}
+
 int main () {
   int* spells_len;
   char** spells = read("spells.txt", &spells_len);
@@ -50,6 +56,8 @@ int main () {
   scanf("%s", &playerTwo.name);
   playerTwo.type = "human";
 
+  struct player players[2] = {playerOne, playerTwo};
+
   // display table of spells
   printf("--------------------\n");
   printf("|%20s", "|\n");
@@ -62,6 +70,14 @@ int main () {
     }
     printf("%d| %-*s\t", i+1, MAX_LEN+2, spells[i]);
   }
+
+  srand(time(NULL));
+  printf("\n\n---------------\n");
+  printf("Tossing coin...\n");
+  printf("---------------\n");
+  sleep(2);
+  int startingPlayer = coin();
+  printf("%s BEGINS.\n", &(players[startingPlayer]).name);
   
   return 0;
 }
