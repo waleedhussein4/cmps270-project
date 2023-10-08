@@ -2,37 +2,48 @@
 #include <string.h>
 #include <time.h>
 #include <stdbool.h>
+#include <stdlib.h>  
+#include <unistd.h>  
 
 #define MAX_LEN 20
 
-char** read( char* fileName, int* len ) {
-  FILE *file;
-  file = fopen(fileName, "r");
+struct player {
+    char name[MAX_LEN]; 
+    char *type; // human or bot
+};
 
-  fscanf(file, "%d", len);
-  char buf[MAX_LEN];
-  fgets(buf, MAX_LEN, file);
-  
-  char** text = (char**)malloc(sizeof(char*) * *len);
-  for (int i = 0; i < *len; i++) {
-    text[i] = (char*)malloc(sizeof(char) * MAX_LEN);
-  }
-
-  int line = 0;
-  while ( !feof(file) && !ferror(file) ) { //  keep reading until the end of the file
-    if (fgets(text[line], MAX_LEN, file) != NULL) {
-      line++;
+char** readSpells(char* fileName, int* len) {
+    FILE *file = fopen(fileName, "r");
+    if (!file) {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
     }
-  }
 
-  fclose(file);
+    fscanf(file, "%d", len);
+    char buf[MAX_LEN];
+    fgets(buf, MAX_LEN, file);  
 
-  //  loop through text lines and remove linebreaks
-  for (int i = 0; i < len[0]; i++) {
-    text[i][strlen(text[i])-1] = '\0';
-  }
+    char** text = (char**)malloc(sizeof(char*) * *len);
+    if (!text) {
+        perror("Memory allocation failed");
+        exit(EXIT_FAILURE);
+    }
 
-  return text;
+    for (int i = 0; i < *len; i++) {
+        text[i] = (char*)malloc(sizeof(char) * MAX_LEN);
+        if (!text[i]) {
+            perror("Memory allocation failed");
+            exit(EXIT_FAILURE);
+        }
+        if (fgets(text[i], MAX_LEN, file) == NULL) {
+            perror("Error reading file");
+            exit(EXIT_FAILURE);
+        }
+        text[i][strlen(text[i])-1] = '\0'; 
+    }
+
+    fclose(file);
+    return text;
 }
 
 void displaySpells ( char** spells, int spells_len ) {
@@ -124,12 +135,12 @@ void game(char** spells, int spells_len, struct player* players, int startingPla
                 strcpy(usedSpells[usedSpells_len], spell);
                 usedSpells_len++;
 
-                // Shift remaining spells left to overwrite used spell
+            
                 for (int j = i; j < spells_len - 1; j++) {
                     strcpy(spells[j], spells[j + 1]);
                 }
 
-                spells_len--;  // Decrease spell count
+                spells_len--;  
                 break;
             }
         }
@@ -139,41 +150,45 @@ void game(char** spells, int spells_len, struct player* players, int startingPla
         currentPlayer = 1 - currentPlayer;
     }
 
-    // Free allocated memory
+    
     for (int i = 0; i < usedSpells_len; i++) {
         free(usedSpells[i]);
     }
     free(usedSpells);
 }
 
-int main () {
-  int* spells_len;
-  char** spells = read("spells.txt", &spells_len);
 
- struct player {
-    char * name; //  first name
-    char * type; //  human or bot
-  }playerOne, playerTwo;
+int main() {
+    int spells_len;
+    char** spells = readSpells("spells.txt", &spells_len);
 
-  printf("Player one, enter your name: ");
-  scanf("%s", &playerOne.name);
-  playerOne.type = "human";
+    struct player playerOne, playerTwo;
 
-  printf("Player two, enter your name: ");
-  scanf("%s", &playerTwo.name);
-  playerTwo.type = "human";
+    printf("Player one, enter your name: ");
+    scanf("%19s", playerOne.name);  
+    playerOne.type = "human";
 
-  struct player players[2] = {playerOne, playerTwo};
+    printf("Player two, enter your name: ");
+    scanf("%19s", playerTwo.name);
+    playerTwo.type = "human";
 
-  displaySpells(spells, spells_len);
+    struct player players[2] = {playerOne, playerTwo};
 
-  srand(time(NULL));
-  printf("\n\n---------------\n");
-  printf("Tossing coin...\n");
-  printf("---------------\n");
-  sleep(2);
-  int startingPlayer = coin();
-  printf("%s BEGINS.\n", &(players[startingPlayer]).name);
-  game(spells, spells_len, players, startingPlayer);
-  return 0;
+    displaySpells(spells, spells_len);
+
+    srand(time(NULL));
+    printf("\n\n---------------\n");
+    printf("Tossing coin...\n");
+    printf("---------------\n");
+    sleep(2);
+    int startingPlayer = coin();
+    printf("%s BEGINS.\n", players[startingPlayer].name);
+    game(spells, spells_len, players, startingPlayer);
+
+    for (int i = 0; i < spells_len; i++) {
+        free(spells[i]);
+    }
+    free(spells);
+
+    return 0;
 }
