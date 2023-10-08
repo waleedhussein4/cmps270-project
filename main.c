@@ -174,6 +174,6 @@ int main () {
   sleep(2);
   int startingPlayer = coin();
   printf("%s BEGINS.\n", &(players[startingPlayer]).name);
-  
+  game(spells, spells_len, players, startingPlayer);
   return 0;
 }
