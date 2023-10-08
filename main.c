@@ -55,29 +55,95 @@ int coin () {
 }
 
 bool condition_isInList ( char** spells, int spells_len, char* spell ) {
-  return false;
+  for (int i = 0; i < spells_len; i++) {
+        if (strcmp(spells[i], spell) == 0) {
+            return true;
+        }
+    }
+    return false;
 }
 
-bool condition_notAlreadyCast ( char** spells, int spells_len, char* spell, char** usedSpells ) {
-  return true;
+bool condition_notAlreadyCast ( char** usedSpells, int usedSpells_len, char* spell ) {
+    for (int i = 0; i < usedSpells_len; i++) {
+        if (strcmp(usedSpells[i], spell) == 0) {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool condition_charMatch ( char* spell, char* spell_previous ) {
-  return false;
+   if (spell[0] == spell_previous[strlen(spell_previous) - 1]) {
+        return true;
+    }
+    return false;
 }
 
 bool condition_validSpellExists ( char** spells, int spells_len, char* spell_previous ) {
-  return false;
+    for (int i = 0; i < spells_len; i++) {
+        if (condition_charMatch(spells[i], spell_previous)) {
+            return true;
+        }
+    }
+    return false;
 }
 
-void game ( char** spells, int spells_len, struct player* players, int startingPlayer ) {
-  //  char** usedSpells
-  //  while (true) loop 
-  //  alternate turns, starting with 'startingPlayer'
-  //  check if there exists a valid spell to respond to previous spell. if true, continue, else end game
-  //  input spell
-  //  check conditions 
-  //  if matches conditions, remove it from spells array, otherwise end game
+void game(char** spells, int spells_len, struct player* players, int startingPlayer) {
+    char** usedSpells = (char**)malloc(sizeof(char*) * spells_len);
+    int usedSpells_len = 0;
+    char spell_previous[MAX_LEN] = "";  // No previous spell at the start
+    int currentPlayer = startingPlayer;
+
+    while (true) {
+        printf("\n%s's turn.\n", players[currentPlayer].name);
+
+        // Input spell
+        char spell[MAX_LEN];
+        printf("Enter a spell: ");
+        scanf("%s", spell);
+
+        // Check conditions
+        if (!condition_isInList(spells, spells_len, spell) ||
+            !condition_notAlreadyCast(usedSpells, usedSpells_len, spell) ||
+            (strlen(spell_previous) > 0 && !condition_charMatch(spell, spell_previous))) {
+
+            printf("Invalid or repeated spell. %s wins!\n", players[1 - currentPlayer].name);
+            break;
+        }
+
+        // Check if a valid spell exists for the next round
+        if (!condition_validSpellExists(spells, spells_len, spell)) {
+            printf("No valid spell exists for the next round. %s wins!\n", players[currentPlayer].name);
+            break;
+        }
+
+        // Remove spell from spells array and add to usedSpells array
+        for (int i = 0; i < spells_len; i++) {
+            if (strcmp(spells[i], spell) == 0) {
+                usedSpells[usedSpells_len] = (char*)malloc(sizeof(char) * MAX_LEN);
+                strcpy(usedSpells[usedSpells_len], spell);
+                usedSpells_len++;
+
+                // Shift remaining spells left to overwrite used spell
+                for (int j = i; j < spells_len - 1; j++) {
+                    strcpy(spells[j], spells[j + 1]);
+                }
+
+                spells_len--;  // Decrease spell count
+                break;
+            }
+        }
+
+        // Update spell_previous and switch player
+        strcpy(spell_previous, spell);
+        currentPlayer = 1 - currentPlayer;
+    }
+
+    // Free allocated memory
+    for (int i = 0; i < usedSpells_len; i++) {
+        free(usedSpells[i]);
+    }
+    free(usedSpells);
 }
 
 int main () {
