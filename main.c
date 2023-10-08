@@ -5,11 +5,6 @@
 
 #define MAX_LEN 20
 
- struct player {
-    char * name; //  first name
-    char * type; //  human or bot
-  }playerOne, playerTwo;
-
 char** read( char* fileName, int* len ) {
   FILE *file;
   file = fopen(fileName, "r");
@@ -154,6 +149,11 @@ void game(char** spells, int spells_len, struct player* players, int startingPla
 int main () {
   int* spells_len;
   char** spells = read("spells.txt", &spells_len);
+
+ struct player {
+    char * name; //  first name
+    char * type; //  human or bot
+  }playerOne, playerTwo;
 
   printf("Player one, enter your name: ");
   scanf("%s", &playerOne.name);
