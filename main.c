@@ -2,8 +2,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdbool.h>
-#include <stdlib.h>  
-#include <unistd.h>  
+#include <stdlib.h>
 
 #define MAX_LEN 20
 
