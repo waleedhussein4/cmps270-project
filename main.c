@@ -4,8 +4,15 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <limits.h> 
 
-#define MAX_LEN 20
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h> 
+#endif
+
+#define MAX_LEN 100
 
 struct player {
     char *name;
@@ -100,28 +107,74 @@ bool condition_validSpellExists ( char** spells, int spells_len, char* spell_pre
 }
 
 char* bot_easy (char** spells, int spells_len, char** usedSpells, int usedSpells_len, char* spell_previous) {
-    return "easy";
+    
+    for (int i = 0; i < spells_len; i++) {
+        if (condition_notAlreadyCast(usedSpells, usedSpells_len, spells[i]) &&
+            (strlen(spell_previous) == 0 || condition_charMatch(spells[i], spell_previous))) {
+            return spells[i];
+        }
+    }
+
+    if (spells_len > 0) {
+        int randomIndex = rand() % spells_len;
+        return spells[randomIndex];
+    }
+    
+    return "";
 }
 
 char* bot_medium (char** spells, int spells_len, char** usedSpells, int usedSpells_len, char* spell_previous) {
-    return "medium";
+    int minResponses = INT_MAX;
+    char* chosenSpell = NULL;
+
+    for (int i = 0; i < spells_len; i++) {
+        if (condition_notAlreadyCast(usedSpells, usedSpells_len, spells[i]) &&
+            (strlen(spell_previous) == 0 || condition_charMatch(spells[i], spell_previous))) {
+
+            int responses = 0;
+            for (int j = 0; j < spells_len; j++) {
+                if (i != j && condition_charMatch(spells[j], spells[i])) {
+                    responses++;
+                }
+            }
+
+            if (responses == 0) {
+                return spells[i];
+            }
+
+            if (responses < minResponses) {
+                minResponses = responses;
+                chosenSpell = spells[i];
+            }
+        }
+    }
+
+    if (chosenSpell != NULL) {
+        return chosenSpell;
+    }
+
+    return "";
 }
+
 
 char* bot_hard (char** spells, int spells_len, char** usedSpells, int usedSpells_len, char* spell_previous) {
     return "hard";
 }
 
 char* bot (char* difficulty, char** spells, int spells_len, char** usedSpells, int usedSpells_len, char* spell_previous) {
-    if (difficulty == "easy") {
+    if (strcmp(difficulty, "easy") == 0) {
         return bot_easy(spells, spells_len, usedSpells, usedSpells_len, spell_previous);
     }
-    if (difficulty == "medium") {
+    if (strcmp(difficulty, "medium") == 0) {
         return bot_medium(spells, spells_len, usedSpells, usedSpells_len, spell_previous);
     }
-    if (difficulty == "hard") {
+    if (strcmp(difficulty, "hard") == 0) {
         return bot_hard(spells, spells_len, usedSpells, usedSpells_len, spell_previous);
     }
+
+    return NULL;
 }
+
 
 void game (char** spells, int spells_len, struct player* players, int startingPlayer, char* difficulty) {
     char** usedSpells = (char**)malloc(sizeof(char*) * spells_len);
@@ -134,11 +187,11 @@ void game (char** spells, int spells_len, struct player* players, int startingPl
 
         // Input spell
         char spell[MAX_LEN];
-        if (players[currentPlayer].type == "human") {
-            printf("Enter a spell: ");
-            scanf("%s", spell);
+        if (strcmp(players[currentPlayer].type, "human") == 0) {
+        printf("Enter a spell: ");
+        scanf("%s", spell);
         }
-        else if (players[currentPlayer].type == "bot") {
+        else if (strcmp(players[currentPlayer].type, "bot") == 0) {
             char* choice = bot(difficulty, spells, spells_len, usedSpells, usedSpells_len, spell_previous);
             strcpy(spell, choice);
             printf("%s chose %s.\n", players[currentPlayer].name, choice);
@@ -218,7 +271,12 @@ int main() {
     printf("\n\n---------------\n");
     printf("Tossing coin...\n");
     printf("---------------\n");
+    #ifdef _WIN32
+    Sleep(2000);
+    #else
     sleep(2);
+    #endif
+
     int startingPlayer = coin();
     printf("%s BEGINS.\n", players[startingPlayer].name);
     game(spells, spells_len, players, startingPlayer, difficulty);
