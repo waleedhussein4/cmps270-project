@@ -107,10 +107,15 @@ bool condition_validSpellExists ( char** spells, int spells_len, char* spell_pre
 }
 
 char* bot_easy (char** spells, int spells_len, char** usedSpells, int usedSpells_len, char* spell_previous) {
+
+    if (strlen(spell_previous) == 0) {
+        int randomIndex = rand() % spells_len;
+        return spells[randomIndex];
+    }
     
     for (int i = 0; i < spells_len; i++) {
         if (condition_notAlreadyCast(usedSpells, usedSpells_len, spells[i]) &&
-            (strlen(spell_previous) == 0 || condition_charMatch(spells[i], spell_previous))) {
+            condition_charMatch(spells[i], spell_previous)) {
             return spells[i];
         }
     }
@@ -151,13 +156,13 @@ char* bot_medium (char** spells, int spells_len, char** usedSpells, int usedSpel
         }
     }
 
-    if (chosenSpell != NULL) {
-        return chosenSpell;
+    if (chosenSpell == NULL) {
+        int randomIndex = rand() % spells_len;
+        return spells[randomIndex];
     }
 
-    return "";
+    return chosenSpell;
 }
-
 
 char* bot_hard (char** spells, int spells_len, char** usedSpells, int usedSpells_len, char* spell_previous) {
     return "hard";
