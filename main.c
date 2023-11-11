@@ -133,7 +133,9 @@ char* bot_medium (char** spells, int spells_len, char** usedSpells, int usedSpel
 
             int responses = 0;
             for (int j = 0; j < spells_len; j++) {
-                if (i != j && condition_charMatch(spells[j], spells[i])) {
+
+                if (i != j && condition_notAlreadyCast(usedSpells, usedSpells_len, spells[j]) && 
+                    condition_charMatch(spells[j], spells[i])) {
                     responses++;
                 }
             }
