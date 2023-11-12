@@ -165,7 +165,57 @@ char* bot_medium (char** spells, int spells_len, char** usedSpells, int usedSpel
 }
 
 char* bot_hard (char** spells, int spells_len, char** usedSpells, int usedSpells_len, char* spell_previous) {
-    return "hard";
+    int minResponses = INT_MAX;
+    char* chosenSpell = NULL;
+
+    for (int i = 0; i < spells_len; i++) {
+        if (condition_notAlreadyCast(usedSpells, usedSpells_len, spells[i]) &&
+            (strlen(spell_previous) == 0 || condition_charMatch(spells[i], spell_previous))) {
+
+            int responses = 0;
+            int minOpponentResponses = INT_MAX;
+
+            for (int j = 0; j < spells_len; j++) {
+                if (i != j && condition_notAlreadyCast(usedSpells, usedSpells_len, spells[j]) &&
+                    condition_charMatch(spells[j], spells[i])) {
+                    responses++;
+                    int opponentResponses = 0;
+                    for (int k = 0; k < spells_len; k++) {
+                        if (k != j && condition_notAlreadyCast(usedSpells, usedSpells_len, spells[k]) &&
+                            condition_charMatch(spells[k], spells[j])) {
+                            opponentResponses++;
+                        }
+                    }
+                    if (opponentResponses < minOpponentResponses) {
+                        minOpponentResponses = opponentResponses;
+                    }
+                }
+            }
+
+            if (responses == 0) {
+                return spells[i];
+            }
+
+            if (minOpponentResponses < minResponses) {
+                minResponses = minOpponentResponses;
+                chosenSpell = spells[i];
+            }
+        }
+    }
+
+    if (chosenSpell != NULL) {
+        return chosenSpell;
+    }
+
+    while (spells_len > 0) {
+        int randomIndex = rand() % spells_len;
+        if (condition_notAlreadyCast(usedSpells, usedSpells_len, spells[randomIndex]) &&
+            (strlen(spell_previous) == 0 || condition_charMatch(spells[randomIndex], spell_previous))) {
+            return spells[randomIndex];
+        }
+    }
+
+    return "";
 }
 
 char* bot (char* difficulty, char** spells, int spells_len, char** usedSpells, int usedSpells_len, char* spell_previous) {
