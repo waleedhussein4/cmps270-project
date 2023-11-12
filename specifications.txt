@@ -1,0 +1,91 @@
+Specifications:
+
+Common methods between Phases 1 and 2:
+
+char** readSpells(char* fileName, int* len)
+requires: an existing file, a positive integer for length
+effects: it reads the spells from the spells text file to allow the use of the spells in the game
+
+void displaySpells(char** spells, int spells_len)
+requires: spells that exist in spells.txt
+effects: it prints the spells being used
+
+int coin()
+requires: nothing
+effects: flips a coin to check which player starts first
+
+bool condition_isInList(char** spells, int spells_len, char* spell)
+requires: spells that exist in spells.txt
+effects: returns if the spell exists
+
+bool condition_notAlreadyCast(char** usedSpells, int usedSpells_len, chr* spell)
+requires: an already used spell and a spell that exists in spells.txt
+effects: compares the used spell with spell and returns if it was already cast or not
+
+bool condition_charMatch(char* spell, char* spell_previous)
+requires: two spells that exist in spells.txt
+effects: returns if the first letter of the spell is the same as the last letter of the previous spell
+
+bool condition_validSpellExists(char** spells, int spells_len, char* spell_previous)
+requires: two spells that exist in spells.txt
+effects: returns is a valid spell still exists after n rounds of the game
+
+Different methods:
+
+Phase 1:
+
+void game(char** spells, int spells_len, struct player* players, int startingPlayer)
+requires: a player and a spell that exists in spells.txt
+effects: two players go head to head in a spell casting game to see who comes out on top, when casting a spell, a variety of conditions are present that a player should abide by, else they'll lose
+
+Phase 2:
+
+char* bot_easy (char** spells, int spells_len, char** usedSpells, int usedSpells_len, char* spell_previous)
+requires: a previously used spell and a spell that exist in spells.txt
+effects: the bot iterates over the remaining spells until it finds a valid spell
+
+char* bot_medium (char** spells, int spells_len, char** usedSpells, int usedSpells_len, char* spell_previous)
+requires: a previously used spell and a spell that exist in spells.txt
+effects: the bot iterates over the remaining spells and for each one it checks wether there exists another spell which the player can use to respond to this spell, it will choose the spell which leaves no valid spells for the next turn, it does this one time
+
+char* bot_hard (char** spells, int spells_len, char** usedSpells, int usedSpells_len, char* spell_previous)
+requires: a previously used spell and a spell that exist in spells.txt
+effects: the bot iterates over the remaining spells and for each one it checks wether there exists another spell which the player can use to respond to this spell, it will choose the spell which leaves no valid spells for the next turn, it does this three times
+
+char* bot (char* difficulty, char** spells, int spells_len, char** usedSpells, int usedSpells_len, char* spell_previous)
+requires: a previously used spell and a spell that exist in spells.txt and a difficulty(easy, medium, hard)
+effects: sets the bot's difficulty
+
+void game(char** spells, int spells_len, struct player* players, int startingPlayer, char* difficulty)
+requires: a player and a spell that exists in spells.txt and a valid bot difficulty
+effects: a player and a bot go head to head in a spell casting game to see who comes out on top, when casting a spell, a variety of conditions are present that a player should abide by, else they'll lose
+
+Test Cases:
+
+Phase 1:
+
+test input: player 1 inputs a spell that doesn't exist
+result: player 2 wins
+and vice versa
+
+test input: player 2 inputs the same spell as player 1
+result: player 1 wins
+and vice versa
+
+test input: player 2 inputs a spell that doesn't have the same first letter as player 1's spells' last letter
+result: player 1 wins
+and vice versa
+
+Phase 2:
+
+test input: player 1 inputs a spell that doesn't exist
+result: The bot wins
+and vice versa
+
+test input: The bot inputs the same spell as player 1
+result: player 1 wins
+and vice versa
+
+test input: The bot inputs a spell that doesn't have the same first letter as player 1's spells' last letter
+result: player 1 wins
+and vice versa
